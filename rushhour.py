@@ -280,15 +280,12 @@ class Search:
         self.grid.makeMove(successor)
         score = 0
         endOfSpecial = self.grid.special.position[0] + self.grid.special.length
-        blocking = []
         for x in range(endOfSpecial, self.grid.width):
             atLocation = self.grid.vehicleAt((x, self.grid.exitRow))
             if atLocation != None:
                 score += 10
-                blocking.append(atLocation)
+                score -= 1 * len(atLocation.validMoves())
         # Break ties by mobility of blocking cars
-        for v in blocking:
-            score -= 1 * len(v.validMoves())
         if self.grid.isFinished():
             score -= 9999
         self.grid.loadState(restoreState)
@@ -299,10 +296,8 @@ class Search:
         
     def printSolution(self, moves):
         initialState = self.grid.state()
-        print ("Solved in %i moves" % len(moves))
-        self.grid.printGrid()
-        print "\n"
         for move in moves:
+            print ("Move " + str(move[0]) + " " + str(move[1]) + " space(s) " + move[2])
             self.grid.makeMove(move)
             self.grid.printGrid()
             print "\n"
@@ -327,9 +322,11 @@ def writeToFile(path, moves):
 
 def main():
     printSolutions = False
-    if len(argv) != 3 or not (len(argv) == 4 and argv[1] == "-p"):
+    if len(argv) < 3 or (len(argv) != 3 and not (len(argv) == 4 or argv[1] == "-p")):
         print "Usage:\t rushhour.py [-p] inputFile outputFile"
-    printSolutions = (argv[1] == "-p" and len(argv) == 4)
+        print "\t -p \t print solution to stdout"
+        exit()
+    printSolutions = len(argv) > 3 and (argv[1] == "-p" and len(argv) == 4)
     inPath = argv[2] if printSolutions else argv[1]
     outPath = argv[3] if printSolutions else argv[2]
             
