@@ -222,10 +222,10 @@ class Search:
         self.map = dict()
         self.grid = grid
         self.expandedNodes = 0
-        self.dfs = False
+        self.bfs = False
     
-    def useDFS(self, dfs):
-        self.dfs = dfs
+    def useBFS(self, bfs):
+        self.bfs = bfs
 
     def costOfMoves(self, moveList):
         return 10 * len(moveList)
@@ -236,7 +236,7 @@ class Search:
         self.map[str(initialState)] = []
         for move in self.grid.allMoves():
             g_cost = self.costOfMoves(self.map[str(initialState)]) + 1
-            h_cost = self.nullHeuristic(move, initialState) if self.dfs else self.heuristic(move, initialState)
+            h_cost = self.nullHeuristic(move, initialState) if self.bfs else self.heuristic(move, initialState)
             self.fringe.push((move, initialState), g_cost + h_cost)
 
         # The actual algorithm
@@ -271,7 +271,7 @@ class Search:
                 
                 for move in self.grid.allMoves():
                     g_cost = self.costOfMoves(self.map[str(newState)]) + 1
-                    h_cost = self.nullHeuristic(move, newState) if self.dfs else self.heuristic(move, newState)
+                    h_cost = self.nullHeuristic(move, newState) if self.bfs else self.heuristic(move, newState)
                     self.fringe.push((move, newState), g_cost + h_cost)
         print("Expanded %i positions" % self.expandedNodes)
         print("Exhausted Fringe")
@@ -326,15 +326,15 @@ def writeToFile(path, moves):
 
 def main():
     printSolutions = "-p" in argv
-    dfsSearch = "-dfs" in argv
+    bfsSearch = "-bfs" in argv
     if printSolutions:
         argv.remove("-p")
-    if dfsSearch:
-        argv.remove("-dfs")
+    if bfsSearch:
+        argv.remove("-bfs")
     if len(argv) != 3:
-        print "Usage:\t rushhour.py [-p] [-dfs] inputFile outputFile"
+        print "Usage:\t rushhour.py [-p] [-bfs] inputFile outputFile"
         print "\t -p \t print solution to stdout"
-        print "\t -dfs \t do a depth-first search"
+        print "\t -bfs \t do a depth-first search"
         exit()
     inPath = argv[1]
     outPath = argv[2]
@@ -343,7 +343,7 @@ def main():
     loadToGrid(inPath, g)
     g.printGrid()
     Solver = Search(g)
-    Solver.useDFS(dfsSearch)
+    Solver.useBFS(bfsSearch)
     moves = Solver.aStarSearch()
     if moves != []:
         print ("Solved in %i moves" % len(moves))
