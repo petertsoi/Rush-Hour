@@ -224,7 +224,7 @@ class Search:
         self.expandedNodes = 0
     
     def costOfMoves(self, moveList):
-        return len(moveList)
+        return 10 * len(moveList)
 
     def aStarSearch(self):
         # Start with initial state
