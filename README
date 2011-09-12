@@ -1,0 +1,3 @@
+Usage:  rushhour.py [-p] [-dfs] inputFile outputFile
+	    -p 	 print solution to stdout
+	    -dfs 	 do a depth-first search
