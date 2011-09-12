@@ -222,7 +222,11 @@ class Search:
         self.map = dict()
         self.grid = grid
         self.expandedNodes = 0
+        self.dfs = False
     
+    def useDFS(self, dfs):
+        self.dfs = dfs
+
     def costOfMoves(self, moveList):
         return 10 * len(moveList)
 
@@ -232,7 +236,7 @@ class Search:
         self.map[str(initialState)] = []
         for move in self.grid.allMoves():
             g_cost = self.costOfMoves(self.map[str(initialState)]) + 1
-            h_cost = self.heuristic(move, initialState)
+            h_cost = self.nullHeuristic(move, initialState) if self.dfs else self.heuristic(move, initialState)
             self.fringe.push((move, initialState), g_cost + h_cost)
 
         # The actual algorithm
@@ -267,7 +271,7 @@ class Search:
                 
                 for move in self.grid.allMoves():
                     g_cost = self.costOfMoves(self.map[str(newState)]) + 1
-                    h_cost = self.heuristic(move, newState)
+                    h_cost = self.nullHeuristic(move, newState) if self.dfs else self.heuristic(move, newState)
                     self.fringe.push((move, newState), g_cost + h_cost)
         print("Expanded %i positions" % self.expandedNodes)
         print("Exhausted Fringe")
@@ -284,8 +288,8 @@ class Search:
             atLocation = self.grid.vehicleAt((x, self.grid.exitRow))
             if atLocation != None:
                 score += 10
-                score -= 1 * len(atLocation.validMoves())
-        # Break ties by mobility of blocking cars
+                # Break ties by mobility of blocking cars
+                score -= 2 * len(atLocation.validMoves())
         if self.grid.isFinished():
             score -= 9999
         self.grid.loadState(restoreState)
@@ -321,19 +325,25 @@ def writeToFile(path, moves):
         i += 1
 
 def main():
-    printSolutions = False
-    if len(argv) < 3 or (len(argv) != 3 and not (len(argv) == 4 or argv[1] == "-p")):
-        print "Usage:\t rushhour.py [-p] inputFile outputFile"
+    printSolutions = "-p" in argv
+    dfsSearch = "-dfs" in argv
+    if printSolutions:
+        argv.remove("-p")
+    if dfsSearch:
+        argv.remove("-dfs")
+    if len(argv) != 3:
+        print "Usage:\t rushhour.py [-p] [-dfs] inputFile outputFile"
         print "\t -p \t print solution to stdout"
+        print "\t -dfs \t do a depth-first search"
         exit()
-    printSolutions = len(argv) > 3 and (argv[1] == "-p" and len(argv) == 4)
-    inPath = argv[2] if printSolutions else argv[1]
-    outPath = argv[3] if printSolutions else argv[2]
+    inPath = argv[1]
+    outPath = argv[2]
             
     g = Grid(6, 6, 3)
     loadToGrid(inPath, g)
     g.printGrid()
     Solver = Search(g)
+    Solver.useDFS(dfsSearch)
     moves = Solver.aStarSearch()
     if moves != []:
         print ("Solved in %i moves" % len(moves))
