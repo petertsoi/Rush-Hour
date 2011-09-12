@@ -82,6 +82,14 @@ class Grid:
             if r == self.exitRow:
                 stdout.write(">> exit")
             stdout.write("\n\n")
+    
+    def isFinished(self):
+        if self.special.orientation == "right" and self.special.position[0] + self.special.length - 1 == self.width :
+            return True
+        elif self.special.orientation == "left" and self.special.position[0] == self.width:
+            return True
+        else:
+            return False
 
 
 class Vehicle:
@@ -189,6 +197,7 @@ def main():
     carD = Vehicle('D', 2, (4, 6), "left", g)
     special = Vehicle('S', 2, (2, 3), "right", g)
     g.printGrid()
+    print g.isFinished()
 
 if __name__ == "__main__":
     main()
