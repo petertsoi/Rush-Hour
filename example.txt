@@ -1,0 +1,5 @@
+A 4 1,2 down 
+B 3 4,3 down 
+C 2 5,1 down 
+D 2 3,6 right 
+S 2 2,3 right 
