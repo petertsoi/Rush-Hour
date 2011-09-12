@@ -255,6 +255,7 @@ class Search:
                 continue
             else:
                 self.expandedNodes += 1
+                #print move[0]
                 newMoveList = self.map[str(move[1])][:]
                 newMoveList.append(move[0])
                 self.map[str(newState)] = newMoveList
@@ -274,6 +275,9 @@ class Search:
     
     def heuristic(self, successor, state):
         # Rank by how many cars in between the special car and exit
+        restoreState = self.grid.state()
+        self.grid.loadState(state)
+        self.grid.makeMove(successor)
         score = 0
         endOfSpecial = self.grid.special.position[0] + self.grid.special.length
         blocking = []
@@ -285,6 +289,9 @@ class Search:
         # Break ties by mobility of blocking cars
         for v in blocking:
             score -= 1 * len(v.validMoves())
+        if self.grid.isFinished():
+            score -= 9999
+        self.grid.loadState(restoreState)
         return score
     
     def nullHeuristic(self, successor, state):
@@ -322,7 +329,6 @@ def main():
     printSolutions = False
     if len(argv) != 3 or not (len(argv) == 4 and argv[1] == "-p"):
         print "Usage:\t rushhour.py [-p] inputFile outputFile"
-        exit()
     printSolutions = (argv[1] == "-p" and len(argv) == 4)
     inPath = argv[2] if printSolutions else argv[1]
     outPath = argv[3] if printSolutions else argv[2]
